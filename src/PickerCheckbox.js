@@ -1,36 +1,39 @@
 import React, { Component } from 'react';
-import {View,Text,
-        TouchableNativeFeedback,
-        FlatList, CheckBox, Button, StyleSheet } from 'react-native';
+import {
+    View, Text,
+    TouchableNativeFeedback,
+    FlatList, Button, StyleSheet
+} from 'react-native';
 import ModalOVerlay from './modalOverlay';
-import {Ionicons} from '@expo/vector-icons'
+import { Ionicons } from '@expo/vector-icons'
+import Checkbox from 'expo-checkbox';
 
 const ARROW_COLOR = 'black';
-const PLACEHOLDER_COLOR = '#899DAE';
+const PLACEHOLDER_COLOR = '#000';
 const DIVIDER_COLOR = '#EEEEEE';
 const CONFIRM_BUTTON_TITLE = 'Confirm';
 const PLACEHOLDER_ITEMS_SELECTED_COLOR = 'black';
-const PLACEHOLDER_ITEMS_SELECTED = '$count selected item(s)';
+const PLACEHOLDER_ITEMS_SELECTED = '$count item(s) selecionado(s)';
 
 export default class PickerCheckbox extends React.Component {
     constructor(props) {
-        super(props); 
+        super(props);
         this.state = {
             modalVisible: false,
-            checkedItems:[]
+            checkedItems: []
         };
     }
 
 
     //Events
-    handleRequestClose(){
+    handleRequestClose() {
         OnConfirm = this.props.OnConfirm;
 
         if (OnConfirm != null) {
             vData = this.props.data;
             vItems = this.state.checkedItems;
             vKeyField = this.props.KeyField;
-            vResult = vData.filter(function(item){
+            vResult = vData.filter(function (item) {
                 return vItems.includes(item[vKeyField]);
             });
             OnConfirm(vResult);
@@ -42,20 +45,20 @@ export default class PickerCheckbox extends React.Component {
         this.setModalVisible(!this.state.modalVisible);
     }
 
-    handlePressCheckBox(pId){
+    handlePressCheckBox(pId) {
         let tmp = this.state.checkedItems;
 
-        if ( tmp.includes(pId) ) {
-            tmp.splice(tmp.indexOf(pId),1);
+        if (tmp.includes(pId)) {
+            tmp.splice(tmp.indexOf(pId), 1);
         } else {
             tmp.push(pId);
         }
-        this.setState({checkedItems: tmp});
+        this.setState({ checkedItems: tmp });
     }
 
     //Other Methods
     setModalVisible(pVisible) {
-        this.setState({modalVisible: pVisible});
+        this.setState({ modalVisible: pVisible });
     }
 
     ItemExistList(pKey) {
@@ -63,7 +66,7 @@ export default class PickerCheckbox extends React.Component {
     }
 
     //render Methods
-    renderArrow () {
+    renderArrow() {
         vArrowColor = ARROW_COLOR;
         if (this.props.arrowColor != null) {
             vArrowColor = this.props.arrowColor;
@@ -76,11 +79,12 @@ export default class PickerCheckbox extends React.Component {
         return (
             <View style={{
                 justifyContent: 'center',
-                alignItems:'flex-end',
-                paddingRight:15,
-                width:30}}>
+                alignItems: 'flex-end',
+                paddingRight: 15,
+                width: 30,
+            }}>
                 <Ionicons
-                   color={vArrowColor}
+                    color={vArrowColor}
                     size={vArrowSize}
                     name='md-arrow-dropdown'
                 />
@@ -88,83 +92,84 @@ export default class PickerCheckbox extends React.Component {
         )
     }
 
-    renderPlaceHolder (){
+    renderPlaceHolder() {
         vPlaceHolder = this.props.placeholder || '';
         vColorTextPlaceHolder = this.props.placeholderTextColor || PLACEHOLDER_COLOR;
-        if (this.state.checkedItems.length > 0){
+        if (this.state.checkedItems.length > 0) {
             vPlaceHolderSelectedItems = this.props.placeholderSelectedItems || PLACEHOLDER_ITEMS_SELECTED;
             vCount = this.state.checkedItems.length
             vPlaceHolder = vPlaceHolderSelectedItems.replace('$count', vCount);
             vColorTextPlaceHolder = PLACEHOLDER_ITEMS_SELECTED_COLOR
         }
-    
-        return(
+
+        return (
             <View
                 style={StyleCheckBoxListPicker.containerPlaceholder}>
                 <Text style={[{
-                    color:vColorTextPlaceHolder,
-                    fontSize:16
-                    }]}>{vPlaceHolder}</Text>
+                    color: vColorTextPlaceHolder,
+                    fontSize: 18
+                }]}>{vPlaceHolder}</Text>
             </View>
         )
     }
 
     renderCheckBox(pItem) {
-        return(
-            <CheckBox
+        return (
+            <Checkbox
+                style={{ width: 30, height: 30 }}
                 value={this.ItemExistList(pItem[this.props.KeyField])}
-                onValueChange={() => this.handlePressCheckBox(pItem[this.props.KeyField])}/>
+                onValueChange={() => this.handlePressCheckBox(pItem[this.props.KeyField])} />
         )
     }
 
     renderDescriptionCheckBox(pItem) {
         return (
-            <View style={{paddingLeft:10}}>
-                <Text>{pItem[this.props.DescriptionField]}</Text>
+            <View style={{ paddingLeft: 10 }}>
+                <Text style={{ fontSize: 18 }}>{pItem[this.props.DescriptionField]}</Text>
             </View>
         )
     }
     renderItems(pItem) {
-        return(
+        return (
             <TouchableNativeFeedback
-                onPress={() => this.handlePressCheckBox(pItem[this.props.KeyField])}>
-                    <View style={StyleCheckBoxListPicker.containerItem}>
-                        {this.renderCheckBox(pItem)}
-                        {this.renderDescriptionCheckBox(pItem)}
-                    </View>
+                onPress={() => this.handlePressCheckBox(pItem[this.props.KeyField])} >
+                <View style={StyleCheckBoxListPicker.containerItem}>
+                    {this.renderCheckBox(pItem)}
+                    {this.renderDescriptionCheckBox(pItem)}
+                </View>
             </TouchableNativeFeedback>
         )
     }
 
-    renderDivider(){
-        DividerVisible = this.props.dividerVisible||true;
-        DividerColor = this.props.dividerColor||DIVIDER_COLOR;
+    renderDivider() {
+        DividerVisible = this.props.dividerVisible || true;
+        DividerColor = this.props.dividerColor || DIVIDER_COLOR;
         vDivider = null;
-        
+
         if (DividerVisible) {
             vDivider = <View
                 style={{
                     borderBottomColor: DividerColor,
                     borderBottomWidth: 1,
-                    marginTop:10
-                }}/>
+                    marginTop: 10
+                }} />
         }
         return vDivider;
     }
-    
-    renderHeader(){
+
+    renderHeader() {
         if (this.props.headerComponent != null) {
             vDivider = this.renderDivider()
-            }
-            return (
-                <View>
-                    {this.props.headerComponent}
-                    {vDivider}
-                </View>
-            )
         }
+        return (
+            <View>
+                {this.props.headerComponent}
+                {vDivider}
+            </View>
+        )
+    }
 
-    renderFooter(){
+    renderFooter() {
         ButtonTitle = this.props.ConfirmButtonTitle || CONFIRM_BUTTON_TITLE;
         return (
             <View style={StyleCheckBoxListPicker.containerFooter}>
@@ -173,10 +178,11 @@ export default class PickerCheckbox extends React.Component {
     }
 
     renderConfirmButton(pButtonTitle) {
-        return(
+        return (
             <Button
+                color="#001534"
                 onPress={() => this.handleRequestClose()}
-                title={pButtonTitle}/>
+                title={pButtonTitle} />
         )
     }
 
@@ -187,25 +193,25 @@ export default class PickerCheckbox extends React.Component {
         }
         return (
             <FlatList
-                style={{flex:1}}
+                style={{ width: "90%", height: "auto" }}
                 data={this.props.data}
-                extraData = {this.state}
-                renderItem={({item}) => this.renderItems(item)}
-                keyExtractor={(item,index) => index.toString()}>       
+                extraData={this.state}
+                renderItem={({ item }) => this.renderItems(item)}
+                keyExtractor={(item, index) => index.toString()}>
             </FlatList>
         )
     }
-    renderModal(){
+    renderModal() {
         return (
             <View style={{
-                flex:1,
-                justifyContent:'center'
-                }}>
+                flex: 1,
+                justifyContent: 'center'
+            }}>
                 <View style={StyleCheckBoxListPicker.containerHeader}>
                     {this.renderHeader()}
                 </View>
                 {this.renderFlatList()}
-                {this.renderFooter()}       
+                {this.renderFooter()}
             </View>
         )
     }
@@ -214,7 +220,7 @@ export default class PickerCheckbox extends React.Component {
         return (
             <ModalOVerlay
                 cancelable={false}
-                visible={this.state.modalVisible}    
+                visible={this.state.modalVisible}
                 styleContent={StyleCheckBoxListPicker.containerModal}
                 onRequestClose={() => this.handleRequestClose()}>
                 {this.renderModal()}
@@ -228,7 +234,7 @@ export default class PickerCheckbox extends React.Component {
                 onPress={() => this.handlePressPicker()}>
                 <View style={[this.props.containerStyle, StyleCheckBoxListPicker.containerPicker]}>
                     {this.renderPlaceHolder()}
-                    {this.renderArrow()}    
+                    {this.renderArrow()}
                 </View>
             </TouchableNativeFeedback>
         )
@@ -245,43 +251,45 @@ export default class PickerCheckbox extends React.Component {
 }
 
 StyleCheckBoxListPicker = StyleSheet.create({
-    container :{
-        flex:1,
-        backgroundColor:'rgba(0, 0, 0, 0.55)',
-        flexDirection:'column',
-        justifyContent:'center'
+    container: {
+        flex: 1,
+        backgroundColor: 'rgba(0, 0, 0, 0.55)',
+        flexDirection: 'column',
+        justifyContent: 'center'
     },
 
-    containerModal:{
-        flex:1,
-        margin:20,
-        padding:20
+    containerModal: {
+        flex: 1,
+        margin: 20,
+        padding: 20
 
     },
 
-    containerPicker:{
+    containerPicker: {
         flexDirection: 'row',
-        height:45
+        backgroundColor: "#e6e6e6",
+        height: 60
     },
-    containerHeader:{
-        paddingBottom:10,
-        flex:0
+    containerHeader: {
+        paddingBottom: 10,
+        flex: 0
     },
-    containerFooter:{
-        flex:0,
-        paddingTop:10
+    containerFooter: {
+        flex: 0,
+        paddingTop: 10
     },
 
-    containerItem:{
-        flexDirection:'row', 
-        paddingBottom:5,
-        alignItems:'center'
+    containerItem: {
+        flexDirection: 'row',
+        paddingBottom: 5,
+        alignItems: 'center',
     },
-    
+
     containerPlaceholder: {
-        flex:1,
+        flex: 1,
         justifyContent: 'center',
-        paddingLeft:10
+        paddingLeft: 10,
+        backgroundColor: "#e6e6e6",
     }
 
 });
